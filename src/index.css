@@ -1,4 +1,7 @@
 body {
+  width: 100%;
+  height: 100%;
+  background-color: #81cbad;
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -11,4 +14,28 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+.chart-div {
+  grid-column: 1/10;
+}
+h1 {
+  font-size: 1.6rem;
+}
+h2 {
+  font-size: 1.3rem;
+  margin: 0;
+  margin-bottom: 10px;
+}
+span {
+  color: white;
+}
+div {
+  color: #0c5250;
+  font-size: 1.5rem;
+  grid-column: 1/8;
 }

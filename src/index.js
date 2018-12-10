@@ -1,11 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Doughnut } from "react-chartjs-2";
+import { Doughnut, Bar } from "react-chartjs-2";
 import "./index.css";
 
 class App extends React.Component {
   state = {
-    users: []
+    users: [],
+    topFiveDonators: [],
+    newUsers: [],
+    currentDate: new Date()
   };
 
   componentDidMount() {
@@ -24,6 +27,16 @@ class App extends React.Component {
             month: new Date(d.date).getMonth()
           };
         });
+
+        let newUserThisMonth = 0;
+        data.forEach(user => {
+          let createdMonth = new Date(user.date).getMonth();
+          console.log(createdMonth);
+          if (this.state.currentDate.getMonth() === createdMonth) {
+            newUserThisMonth++;
+          }
+        });
+        console.log(newUserThisMonth);
 
         let topdonators = [];
         userdonations.forEach(donations => {
@@ -45,7 +58,7 @@ class App extends React.Component {
           topdonators.push({
             userId: userId,
             username: donatorUsername,
-            totalTreesDonated: totalTreesUser
+            totalTreesDonated: totalTreesUser * 10
           });
         });
         console.log(topdonators);
@@ -70,28 +83,33 @@ class App extends React.Component {
             output.push(item);
           }
         });
-
-        // let outputMonth = [];
-        // donationCat.forEach(function(item) {
-        //   let existing = outputMonth.filter(function(v, i) {
-        //     return v.month == item.month;
-        //   });
-        //   if (existing.length) {
-        //     let existingIndex = outputMonth.indexOf(existing[0]);
-        //     output[existingIndex].trees += item.trees;
-        //   } else {
-        //     if (typeof item.value === "string") item.value = [item.value];
-        //     outputMonth.push(item);
-        //   }
-        // });
-
+        console.log(output);
+        let outputMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        donationCat.forEach(function(item) {
+          let existingMonth = outputMonth.filter(function(v, i) {
+            return v.month == item.month;
+          });
+          if (existingMonth.length) {
+            let existingIndexMonth = outputMonth.indexOf(existingMonth[0]);
+            outputMonth[existingIndexMonth].trees += item.trees;
+          } else {
+            if (typeof item.value === "string") item.value = [item.value];
+            outputMonth[item.month] += item.trees;
+          }
+        });
+        console.log(outputMonth);
         const labels = output.map(f => {
           return f.category;
         });
-        const amounts = output.map(a => {
+        const donationAmounts = donations.map(d => {
+          return d.trees;
+        });
+        console.log(donationAmounts);
+        const amountsPerForest = output.map(a => {
           return a.trees;
         });
-        const totalAmount = amounts.reduce(add, 0);
+
+        const totalAmount = donationAmounts.reduce(add, 0);
 
         function add(a, b) {
           return a + b;
@@ -103,16 +121,53 @@ class App extends React.Component {
           numUsers: data.length,
           donations: donations,
           topFiveDonators: topDon,
-          total: totalAmount * 5,
-          average: (totalAmount * 5) / amounts.length,
+          total: totalAmount * 10,
+          average: Math.floor((totalAmount * 10) / donationAmounts.length),
+          newUsers: newUserThisMonth,
           //donByMonth: outputMonth,
+          barChartData: {
+            labels: [
+              "January",
+              "February",
+              "March",
+              "April",
+              "May",
+              "June",
+              "July",
+              "August",
+              "September",
+              "October",
+              "November",
+              "December"
+            ],
+            datasets: [
+              {
+                lable: "Donation per Month",
+                data: outputMonth,
+                backgroundColor: [
+                  "#0C5250",
+                  "#086965",
+                  "#A8D498",
+                  "#5DBB99",
+                  "#0C5250",
+                  "#086965",
+                  "#A8D498",
+                  "#5DBB99",
+                  "#0C5250",
+                  "#086965",
+                  "#A8D498",
+                  "#5DBB99"
+                ]
+              }
+            ]
+          },
           chartData: {
             labels: labels,
 
             datasets: [
               {
-                lable: "Donations",
-                data: amounts,
+                lable: "Donations per Forest",
+                data: amountsPerForest,
                 backgroundColor: ["#0C5250", "#086965", "#A8D498", "#5DBB99"]
               }
             ]
@@ -138,25 +193,38 @@ class App extends React.Component {
 
     return (
       <div className="main">
-        <div>
+        <div className="number-div">
+          <div>{this.state.currentDate.toDateString()}</div>
+
           <h2>
             Total amount: <span>{this.state.total}kr.</span>
           </h2>
-        </div>
-        <div>
+
           <h2>
             Average donation: <span>{this.state.average}kr.</span>
           </h2>
-        </div>
-        <div>
+
           <h2>
             Number of users: <span>{this.state.numUsers}</span>
           </h2>
+          <h2>
+            New Users this month: <span>{this.state.newUsers}</span>
+          </h2>
+        </div>
+        <div className="topDonators-div">
+          <ol className="topDonators">
+            <h1>Top 5 Donators</h1>
+            {topUsers}
+          </ol>
         </div>
 
         <div className="chart-div">
           <h1>Donations per forest</h1>
           <Chart className="doughnutChart" data={this.state.chartData} />
+        </div>
+        <div className="barchart-div">
+          <h1>Donations per Month</h1>
+          <BarChart data={this.state.barChartData} />
         </div>
       </div>
     );
@@ -165,21 +233,24 @@ class App extends React.Component {
 function Chart(props) {
   return <Doughnut data={props.data} />;
 }
+function BarChart(props) {
+  return <Bar data={props.data} />;
+}
 function User(props) {
   return (
-    <div>
+    <li>
       <h1>{props.username}</h1>
-      <h1>{props.totalDonation}</h1>
-    </div>
+      <h1>{props.totalDonation}kr.</h1>
+    </li>
   );
 }
 
 function Post(props) {
   return (
-    <div className="user">
+    <li className="user">
       <h1>{props.username}</h1>
       <h2>{props.donations}</h2>>
-    </div>
+    </li>
   );
 }
 

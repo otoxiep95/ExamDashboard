@@ -28,8 +28,8 @@ code {
   grid-gap: 10px;
 }
 .main div {
-  background: #81cbad;
-  border-radius: 3%;
+  background: #b7decd;
+  border-radius: 20px;
   width: 90%;
   padding: 5%;
 }
@@ -39,7 +39,7 @@ code {
 
   grid-column: 1/7;
 }
-.number-div div {
+.number-div .currentDate {
   padding: 0;
   grid-column: 1/-1;
 }
@@ -53,7 +53,8 @@ code {
   grid-column: 1/7;
 }
 
-.chart-div h1 {
+.chart-div h1,
+.barchart-div h1 {
   font-size: 1.4em;
   margin-top: 0;
 }
@@ -74,16 +75,15 @@ ol {
 ol h1 {
   font-size: 1.4em;
   margin-top: 0;
-  width: 80%;
 }
 li {
   width: 80%;
-  background-color: white;
+
+  border-radius: 10px;
   margin: 0;
   margin-bottom: 30px;
 }
 li h1 {
-  display: inline;
   margin-left: 30px;
 
   font-size: 1em;

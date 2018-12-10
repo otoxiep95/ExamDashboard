@@ -8,6 +8,7 @@ class App extends React.Component {
     users: [],
     topFiveDonators: [],
     newUsers: [],
+    legend: { display: false },
     currentDate: new Date()
   };
 
@@ -176,12 +177,6 @@ class App extends React.Component {
       });
   }
   render() {
-    const users = this.state.users.map(user => {
-      return (
-        <Post username={user.username} donations={user.donations.length} />
-      );
-    });
-
     const topUsers = this.state.topFiveDonators.map(userDon => {
       return (
         <User
@@ -194,7 +189,9 @@ class App extends React.Component {
     return (
       <div className="main">
         <div className="number-div">
-          <div>{this.state.currentDate.toDateString()}</div>
+          <h2 className="currentDate">
+            {this.state.currentDate.toDateString()}
+          </h2>
 
           <h2>
             Total amount: <span>{this.state.total}kr.</span>
@@ -224,7 +221,7 @@ class App extends React.Component {
         </div>
         <div className="barchart-div">
           <h1>Donations per Month</h1>
-          <BarChart data={this.state.barChartData} />
+          <BarChart legend={this.state.legend} data={this.state.barChartData} />
         </div>
       </div>
     );
@@ -234,22 +231,17 @@ function Chart(props) {
   return <Doughnut data={props.data} />;
 }
 function BarChart(props) {
-  return <Bar data={props.data} />;
+  return <Bar legend={props.legend} data={props.data} />;
 }
 function User(props) {
   return (
     <li>
-      <h1>{props.username}</h1>
-      <h1>{props.totalDonation}kr.</h1>
-    </li>
-  );
-}
-
-function Post(props) {
-  return (
-    <li className="user">
-      <h1>{props.username}</h1>
-      <h2>{props.donations}</h2>>
+      <h1>
+        Username: <span>{props.username}</span>
+      </h1>
+      <h1>
+        Total donations:<span>{props.totalDonation}kr.</span>
+      </h1>
     </li>
   );
 }

@@ -8,7 +8,7 @@ class App extends React.Component {
     users: [],
     topFiveDonators: [],
     newUsers: [],
-    legend: { display: false },
+    legend: { display: true },
     currentDate: new Date()
   };
 
@@ -16,11 +16,13 @@ class App extends React.Component {
     fetch("https://5bfd357c827c3800139ae907.mockapi.io/treefund/user")
       .then(res => res.json())
       .then(data => {
+        //Creates array containing an array of donations per user
         let userdonations = data.map((user, index) => {
           return user.donations;
         });
-        console.log(userdonations);
+        //Array of all donations
         let donations = [].concat.apply([], userdonations);
+        //
         let donationCat = donations.map(d => {
           return {
             category: d.category,
@@ -28,25 +30,24 @@ class App extends React.Component {
             month: new Date(d.date).getMonth()
           };
         });
-
+        //Number of new users this month
         let newUserThisMonth = 0;
+
         data.forEach(user => {
           let createdMonth = new Date(user.date).getMonth();
-          console.log(createdMonth);
+
           if (this.state.currentDate.getMonth() === createdMonth) {
             newUserThisMonth++;
           }
         });
-        console.log(newUserThisMonth);
 
+        //Creates array of users with total amount donated
         let topdonators = [];
         userdonations.forEach(donations => {
-          console.log(donations);
           let userId = 0;
           let totalTreesUser = 0;
           let donatorUsername = "";
           donations.forEach(donation => {
-            console.log(donation.trees);
             totalTreesUser = totalTreesUser + donation.trees;
             userId = donation.userId;
           });
@@ -55,20 +56,20 @@ class App extends React.Component {
               donatorUsername = user.username;
             }
           });
-          console.log(totalTreesUser);
+
           topdonators.push({
             userId: userId,
             username: donatorUsername,
             totalTreesDonated: totalTreesUser * 10
           });
         });
-        console.log(topdonators);
 
+        //Sorts by total amount of donations and gets the first five
         let topDon = topdonators
           .sort((a, b) => b.totalTreesDonated - a.totalTreesDonated)
           .slice(0, 5);
-        console.log(topDon);
 
+        //Merges all donations array by category (forest)
         //https://stackoverflow.com/questions/33850412/merge-javascript-objects-in-array-with-same-key
         let output = [];
         donationCat.forEach(function(item) {
@@ -84,7 +85,8 @@ class App extends React.Component {
             output.push(item);
           }
         });
-        console.log(output);
+
+        //Creates array of donations per month 0-11 by order
         let outputMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         donationCat.forEach(function(item) {
           let existingMonth = outputMonth.filter(function(v, i) {
@@ -98,24 +100,27 @@ class App extends React.Component {
             outputMonth[item.month] += item.trees;
           }
         });
-        console.log(outputMonth);
+
+        //creates array of categories
         const labels = output.map(f => {
           return f.category;
         });
-        const donationAmounts = donations.map(d => {
-          return d.trees;
-        });
-        console.log(donationAmounts);
+        //creates array of values of donations same order as categories
         const amountsPerForest = output.map(a => {
           return a.trees;
         });
 
+        //creates array of dontaions just the amount of trees
+        const donationAmounts = donations.map(d => {
+          return d.trees;
+        });
+
+        //Sums all the donation values
         const totalAmount = donationAmounts.reduce(add, 0);
 
         function add(a, b) {
           return a + b;
         }
-        console.log(output);
 
         this.setState({
           users: data,
